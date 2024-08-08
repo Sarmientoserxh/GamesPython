@@ -2,146 +2,139 @@ import turtle
 import time
 import random
 
-posTime = 0.1  # milesima de segundo; para que no se ejecute tan rapido;
+class SnakeGame:
+    def __init__(self):
+        self.posTime = 0.1  # milisegundos
+        self.score = 0
+        self.high_score = 0
 
-# marcador
-score = 0
-high_Score = 0
+        self.window = turtle.Screen()
+        self.window.title("SnakeGame")
+        self.window.bgcolor("black")
+        self.window.setup(width=600, height=600)
+        self.window.tracer(0)
 
-window = turtle.Screen()
-window.title("SnakeGame")
-window.bgcolor("black")
-window.setup(width=600, height=600)
-window.tracer(0)
+        self.texto = turtle.Turtle()
+        self.texto.speed(0)
+        self.texto.color("white")
+        self.texto.penup()
+        self.texto.hideturtle()
+        self.texto.goto(0, 260)
+        self.texto.write("Score: 0      High Score: 0", align="center", font=("Courier", 23, "normal"))
 
-# Textos del marcador;
-texto = turtle.Turtle()
-texto.speed(0)
-texto.color("white")
-texto.penup()
-texto.hideturtle()
-texto.goto(0, 260)
-texto.write("Score: 0      High Score: 0", align="center", font=("Courier", 23, "normal"))
+        self.head_snake = turtle.Turtle()
+        self.head_snake.speed(0)
+        self.head_snake.shape("square")
+        self.head_snake.color("green")
+        self.head_snake.penup()
+        self.head_snake.goto(0, 0)
+        self.head_snake.direction = "stop"
 
-# head of snake;
-headSnake = turtle.Turtle()
-headSnake.speed(0)
-headSnake.shape("square")
-headSnake.color("green")
-headSnake.penup()  # comando para que quitemos el rastro;
-headSnake.goto(0, 0)
+        self.food_snake = turtle.Turtle()
+        self.food_snake.speed(0)
+        self.food_snake.shape("circle")
+        self.food_snake.color("red")
+        self.food_snake.penup()
+        self.food_snake.goto(0, 100)
 
-# food of the snake
-foodSnake = turtle.Turtle()
-foodSnake.speed(0)
-foodSnake.shape("circle")
-foodSnake.color("red")
-foodSnake.penup()  # comando para que quitemos el rastro;
-foodSnake.goto(0, 100)
+        self.body_snake = []
 
-# cuerpo de la serpiente;
-bodySnake = []
+        self.window.listen()
+        self.window.onkeypress(self.up_snake, "Up")
+        self.window.onkeypress(self.down_snake, "Down")
+        self.window.onkeypress(self.left_snake, "Left")
+        self.window.onkeypress(self.right_snake, "Right")
 
-# dirección inicial de la serpiente;
-headSnake.direction = "stop"
+    def up_snake(self):
+        if self.head_snake.direction != "down":
+            self.head_snake.direction = "up"
 
-# funciones de los movimientos;
-def upSnake():
-    if headSnake.direction != "down":  # Evitar moverse en la dirección opuesta
-        headSnake.direction = "up"
+    def down_snake(self):
+        if self.head_snake.direction != "up":
+            self.head_snake.direction = "down"
 
-def downSnake():
-    if headSnake.direction != "up":
-        headSnake.direction = "down"
+    def left_snake(self):
+        if self.head_snake.direction != "right":
+            self.head_snake.direction = "left"
 
-def leftSnake():
-    if headSnake.direction != "right":
-        headSnake.direction = "left"
+    def right_snake(self):
+        if self.head_snake.direction != "left":
+            self.head_snake.direction = "right"
 
-def rightSnake():
-    if headSnake.direction != "left":
-        headSnake.direction = "right"
+    def move(self):
+        if self.head_snake.direction == "up":
+            y = self.head_snake.ycor()
+            self.head_snake.sety(y + 20)
+        elif self.head_snake.direction == "down":
+            y = self.head_snake.ycor()
+            self.head_snake.sety(y - 20)
+        elif self.head_snake.direction == "left":
+            x = self.head_snake.xcor()
+            self.head_snake.setx(x - 20)
+        elif self.head_snake.direction == "right":
+            x = self.head_snake.xcor()
+            self.head_snake.setx(x + 20)
 
-def mov():
-    if headSnake.direction == "up":
-        y = headSnake.ycor()
-        headSnake.sety(y + 20)
-    elif headSnake.direction == "down":
-        y = headSnake.ycor()
-        headSnake.sety(y - 20)
-    elif headSnake.direction == "left":
-        x = headSnake.xcor()
-        headSnake.setx(x - 20)
-    elif headSnake.direction == "right":
-        x = headSnake.xcor()
-        headSnake.setx(x + 20)
+    def reset_game(self):
+        self.score = 0
+        self.head_snake.goto(0, 0)
+        self.head_snake.direction = "stop"
 
-def reset_game():
-    global score
-    time.sleep(1)
-    headSnake.goto(0, 0)
-    headSnake.direction = "stop"
-    
-    for segment in bodySnake:
-        segment.goto(3000, 3000)
-    bodySnake.clear()
-    
-    score = 0
-    update_score()
+        for segment in self.body_snake:
+            segment.goto(3000, 3000)
+        self.body_snake.clear()
+        self.update_score()
 
-def update_score():
-    texto.clear()
-    texto.write("Score: {}     High Score: {}".format(score, high_Score), align="center", font=("Courier", 23, "normal"))
+    def update_score(self):
+        self.texto.clear()
+        self.texto.write("Score: {}     High Score: {}".format(self.score, self.high_score), align="center", font=("Courier", 23, "normal"))
 
-# conectar con el teclado.
-window.listen()
-window.onkeypress(upSnake, "Up")
-window.onkeypress(downSnake, "Down")
-window.onkeypress(leftSnake, "Left")
-window.onkeypress(rightSnake, "Right")
+    def main_loop(self):
+        while True:
+            self.window.update()
 
-while True:
-    window.update()
+            if (self.head_snake.xcor() > 290 or self.head_snake.xcor() < -290 or 
+                self.head_snake.ycor() > 290 or self.head_snake.ycor() < -290):
+                self.reset_game()
 
-    if (headSnake.xcor() > 290 or headSnake.xcor() < -290 or headSnake.ycor() > 290 or headSnake.ycor() < -290):
-        reset_game()
+            if self.head_snake.distance(self.food_snake) < 20:
+                x = random.randint(-280, 280)
+                y = random.randint(-280, 280)
+                self.food_snake.goto(x, y)
 
-    if headSnake.distance(foodSnake) < 20:
-        x = random.randint(-280, 280)
-        y = random.randint(-280, 280)
-        foodSnake.goto(x, y)
+                new_body_snake = turtle.Turtle()
+                new_body_snake.speed(0)
+                new_body_snake.shape("square")
+                new_body_snake.color("#008F39")
+                new_body_snake.penup()
+                self.body_snake.append(new_body_snake)
 
-        newBodySnake = turtle.Turtle()
-        newBodySnake.speed(0)
-        newBodySnake.shape("square")
-        newBodySnake.color("#008F39")
-        newBodySnake.penup()  # comando para que quitemos el rastro;
-        bodySnake.append(newBodySnake)
+                self.score += 10
 
-        # Aumentar el marcador;
-        score += 10
+                if self.score > self.high_score:
+                    self.high_score = self.score
 
-        if score > high_Score:
-            high_Score = score
+                self.update_score()
 
-        update_score()
+            total_body_snake = len(self.body_snake)
+            for index in range(total_body_snake - 1, 0, -1):
+                x = self.body_snake[index - 1].xcor()
+                y = self.body_snake[index - 1].ycor()
+                self.body_snake[index].goto(x, y)
 
-    # mover el cuerpo de la serpiente animaciones;
-    totalBodySnake = len(bodySnake)
-    for index in range(totalBodySnake - 1, 0, -1):
-        x = bodySnake[index - 1].xcor()
-        y = bodySnake[index - 1].ycor()
-        bodySnake[index].goto(x, y)
+            if total_body_snake > 0:
+                x = self.head_snake.xcor()
+                y = self.head_snake.ycor()
+                self.body_snake[0].goto(x, y)
 
-    if totalBodySnake > 0:
-        x = headSnake.xcor()
-        y = headSnake.ycor()
-        bodySnake[0].goto(x, y)
+            self.move()
 
-    mov()
-    
-    for segmento in bodySnake:
-        if segmento.distance(headSnake) < 20:
-            reset_game()
-    
-    time.sleep(posTime)
+            for segmento in self.body_snake:
+                if segmento.distance(self.head_snake) < 20:
+                    self.reset_game()
+
+            time.sleep(self.posTime)
+
+if __name__ == "__main__":
+    game = SnakeGame()
+    game.main_loop()
